@@ -4,5 +4,5 @@ import com.codedecode.kafkademo.model.CreateProductRestModel;
 
 public interface ProductService {
 
-    String createProduct(CreateProductRestModel productRestModel);
+    String createProduct(CreateProductRestModel productRestModel) throws Exception;
 }

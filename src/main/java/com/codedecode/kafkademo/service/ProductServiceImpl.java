@@ -23,14 +23,19 @@ public class ProductServiceImpl implements ProductService{
     }
 
     @Override
-    public String createProduct(CreateProductRestModel productRestModel) {
+    public String createProduct(CreateProductRestModel productRestModel) throws Exception{
 
         String productId = UUID.randomUUID().toString();
         ProductCreatedEvent productCreatedEvent = new ProductCreatedEvent(productId,
                 productRestModel.getTitle(),
                 productRestModel.getPrice(),
                 productRestModel.getQuantity());
-        CompletableFuture<SendResult<String, ProductCreatedEvent>> future =
+        /*
+        * Line#34 to Line$45 is asynchronous call,
+        * if you add future.join()(at line#47), the thread wait for response from Kafka broker
+        * the below code may confuse the developer, so there is another way to get the response from boker
+        * */
+/*        CompletableFuture<SendResult<String, ProductCreatedEvent>> future =
                         kafkaTemplate.send("product-created-events-topic",
                                 productId,productCreatedEvent);
         future.whenComplete((result, exception) -> {
@@ -40,7 +45,15 @@ public class ProductServiceImpl implements ProductService{
                 LOGGER.info("Message sent successfully: "+result.getRecordMetadata());
             }
         });
-LOGGER.info("**** Returning productId **********");
+        future.join(); // synchronous message call. */
+        LOGGER.info("**** Before publishing product create event ****");
+        SendResult<String, ProductCreatedEvent> result = kafkaTemplate.send("product-created-events-topic",
+                productId,productCreatedEvent).get(); // send() method may be slow here to process since it waits for response from all
+        // Kafka brokers that my message is stored in Kafka Topic successfully.
+        LOGGER.info("Topic: {}", result.getRecordMetadata().topic());
+        LOGGER.info("Partition: {}", result.getRecordMetadata().partition());
+        LOGGER.info("Offset: {}", result.getRecordMetadata().offset());
+        LOGGER.info("**** Returning productId **********");
         return productId;
     }
 }
