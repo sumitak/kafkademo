@@ -1,8 +1,18 @@
 spring:
   kafka:
     producer:
-      bootstrap-servers: localhost:9092
+      bootstrap-servers: localhost:9094,localhost:9092
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      acks: all
+      #retries: 10
+      properties:
+     #   retry.backoff.ms: 1000
+        delivery.timeout.ms: 120000
+        linger.ms: 0
+        request.timeout.ms: 30000
+        enable.idempotence: true #avoid duplicate messages in case of ack failures
+        max.in.flight.requests.per.connection: 6
+
 
 
