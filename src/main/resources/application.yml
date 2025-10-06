@@ -1,5 +1,6 @@
 spring:
   kafka:
+    #Procucer properties
     producer:
       bootstrap-servers: localhost:9094,localhost:9092
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
@@ -7,12 +8,24 @@ spring:
       acks: all
       #retries: 10
       properties:
-     #   retry.backoff.ms: 1000
-        delivery.timeout.ms: 120000
-        linger.ms: 0
-        request.timeout.ms: 30000
-        enable.idempotence: true #avoid duplicate messages in case of ack failures
-        max.in.flight.requests.per.connection: 6
+          #   retry.backoff.ms: 1000
+          delivery.timeout.ms: 120000
+          linger.ms: 0
+          request.timeout.ms: 30000
+          enable.idempotence: true #avoid duplicate messages in case of ack failures
+          max.in.flight.requests.per.connection: 5
+
+    #Conumser properties
+    consumer:
+      bootstrap-servers: localhost:9094,localhost:9092
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      group-id: product-created-events
+      properties.spring.json.trusted.packages: com.codedecode.kafkademo.service
+
+
+
+
 
 
 
