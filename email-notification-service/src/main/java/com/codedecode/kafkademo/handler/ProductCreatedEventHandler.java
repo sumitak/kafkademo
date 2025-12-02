@@ -24,7 +24,7 @@ import org.springframework.web.client.RestTemplate;
 import org.slf4j.Logger;
 
 @Component
-//@KafkaListener(topics="product-created-events-topic") //it can be assigned here to avoid specify under each method name
+@KafkaListener(topics="product-created-events-topic") //it can be assigned here to avoid specify under each method name
 public class ProductCreatedEventHandler {
     private final Logger logger = LoggerFactory.getLogger(ProductCreatedEventHandler.class);
     private RestTemplate restTemplate;
@@ -48,7 +48,6 @@ public class ProductCreatedEventHandler {
                        @Header(KafkaHeaders.RECEIVED_KEY) String messageKey){
      //   if(true) throw new NotRetryableException("Not Retryable");
         logger.info("**** Received product created event ****");
-        logger.info("title id: " + event.getTitle());
 
         //check if the message was already processed before
        ProcessedEventEntity existingProcessedEventEntity = processedEventRepository.findByMessageId(messageId);
